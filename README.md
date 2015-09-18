@@ -5,7 +5,7 @@ It displays a red cross over non-exporting glyphs in Edit View.
 After installation, it will add the menu item *View > Show Export Status*.
 You can set a keyboard shortcut in System Preferences.
 
-![Paths are filled dark gray while editing.](ShowFilledPreview.png "Show Filled Preview Screenshot")
+![Non-exporting glyphs are shown crossed out.](ShowExportStatus.png "Show Export Status Screenshot")
 
 ### Installation
 
