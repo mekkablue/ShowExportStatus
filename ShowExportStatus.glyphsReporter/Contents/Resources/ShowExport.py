@@ -103,7 +103,14 @@ class ShowExport ( NSObject, GlyphsReporterProtocol ):
 			cross.stroke()
 		except Exception as e:
 			self.logToConsole( "drawCrossOverLayer_: %s" % str(e) )
-			
+
+	def bezierPathComp( self, thisPath ):
+		"""Compatibility method for bezierPath before v2.3."""
+		try:
+			return thisPath.bezierPath() # until v2.2
+		except Exception as e:
+			return thisPath.bezierPath # v2.3+
+
 	def drawForegroundForLayer_( self, Layer ):
 		"""
 		Whatever you draw here will be displayed IN FRONT OF the paths.
@@ -151,7 +158,7 @@ class ShowExport ( NSObject, GlyphsReporterProtocol ):
 				if self.controller:
 					# set the drawing color to black:
 					NSColor.darkGrayColor().set()
-					Layer.bezierPath().fill()
+					self.bezierPathComp(Layer).fill()
 					self.drawCrossOverLayer( Layer, 1.0 / self.getScale() )
 
 				# Color for GLYPH IN PREVIEW:	
@@ -163,7 +170,7 @@ class ShowExport ( NSObject, GlyphsReporterProtocol ):
 					else:
 						# set the drawing color to black if preview background is white:
 						NSColor.darkGrayColor().set()
-					Layer.bezierPath().fill()
+					self.bezierPathComp(Layer).fill()
 					self.drawCrossOverLayer( Layer, 1.0 / self.getScale() )
 					
 		except Exception as e:
