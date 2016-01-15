@@ -104,12 +104,18 @@ class ShowExport ( NSObject, GlyphsReporterProtocol ):
 		except Exception as e:
 			self.logToConsole( "drawCrossOverLayer_: %s" % str(e) )
 
-	def bezierPathComp( self, thisPath ):
+	def bezierPathComp( self, thisLayer ):
 		"""Compatibility method for bezierPath before v2.3."""
+		layerBezierPath = NSBezierPath.bezierPath()
 		try:
-			return thisPath.bezierPath() # until v2.2
+			layerBezierPath.appendBezierPath_( thisLayer.bezierPath() ) # until v2.2
 		except Exception as e:
-			return thisPath.bezierPath # v2.3+
+			layerBezierPath.appendBezierPath_( thisLayer.bezierPath ) # v2.3+
+		
+		for thisComponent in thisLayer.components:
+			layerBezierPath.appendBezierPath_( thisComponent.bezierPath() )
+		
+		return layerBezierPath
 
 	def drawForegroundForLayer_( self, Layer ):
 		"""
@@ -133,7 +139,7 @@ class ShowExport ( NSObject, GlyphsReporterProtocol ):
 		https://developer.apple.com/library/mac/documentation/cocoa/reference/applicationkit/classes/NSColor_Class/Reference/Reference.html
 		"""
 		try:
-			if not Layer.parent.export:
+			if not Layer.glyph().export:
 				self.drawCrossOverLayer( Layer, 1.0 / self.getScale() )
 		except Exception as e:
 			self.logToConsole( "drawForegroundForLayer_: %s" % str(e) )
@@ -152,26 +158,41 @@ class ShowExport ( NSObject, GlyphsReporterProtocol ):
 		Whatever you draw here will be displayed behind the paths, but for inactive masters.
 		"""
 		try:
-			thisGlyph = Layer.parent
-			if thisGlyph and not thisGlyph.export:
+			thisGlyph = Layer.glyph()
+			if thisGlyph:
 				# Color for INACTIVE GLYPH IN EDIT VIEW
 				if self.controller:
-					# set the drawing color to black:
-					NSColor.darkGrayColor().set()
-					self.bezierPathComp(Layer).fill()
-					self.drawCrossOverLayer( Layer, 1.0 / self.getScale() )
+					if not thisGlyph.export:
+						# set the drawing color to black:
+						NSColor.darkGrayColor().set()
+						self.bezierPathComp(Layer).fill()
+						self.drawCrossOverLayer( Layer, 1.0 / self.getScale() )
+					#else:
+					#	pass
 
 				# Color for GLYPH IN PREVIEW:	
 				else:
-					# check for background color (can be black or white):
-					if NSUserDefaults.standardUserDefaults().boolForKey_("GSPreview_Black"):
-						# set the drawing color to white if preview background is black:
-						NSColor.lightGrayColor().set()
-					else:
-						# set the drawing color to black if preview background is white:
+					if not thisGlyph.export:
 						NSColor.darkGrayColor().set()
-					self.bezierPathComp(Layer).fill()
-					self.drawCrossOverLayer( Layer, 1.0 / self.getScale() )
+						# check for background color (can be black or white):
+						if NSUserDefaults.standardUserDefaults().boolForKey_("GSPreview_Black"):
+							# set the drawing color to white if preview background is black:
+							NSColor.lightGrayColor().set()
+						self.bezierPathComp(Layer).fill()
+						self.drawCrossOverLayer( Layer, 10.0 )
+					#else:
+					#	NSColor.blackColor().set()
+					#	# check for background color (can be black or white):
+					#	if NSUserDefaults.standardUserDefaults().boolForKey_("GSPreview_Black"):
+					#		# set the drawing color to white if preview background is black:
+					#		NSColor.whiteColor().set()
+					#	print 0
+					#	bezierPaths = self.bezierPathComp(Layer)
+					#	if bezierPaths:
+					#		bezierPaths.fill()
+					#	else:
+					#		print thisGlyph.name, Layer.paths
+						
 					
 		except Exception as e:
 			self.logToConsole( "drawBackgroundForInactiveLayer_: %s" % str(e) )
@@ -201,7 +222,10 @@ class ShowExport ( NSObject, GlyphsReporterProtocol ):
 		drawing), which is probably what you want if you are drawing the glyph
 		yourself in self.drawBackgroundForInactiveLayer_().
 		"""
-		return True
+		if not Layer.glyph().export:
+			return False
+		else:
+			return True
 	
 	def getHandleSize( self ):
 		"""
