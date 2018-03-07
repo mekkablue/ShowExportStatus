@@ -76,7 +76,6 @@ class ShowExport(ReporterPlugin):
 		"""
 		try:
 			thisGlyph = Layer.glyph()
-			print "thisGlyph", thisGlyph
 			if thisGlyph and not thisGlyph.export:
 				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
 		except Exception as e:
