@@ -13,6 +13,7 @@ from __future__ import division, print_function, unicode_literals
 ###########################################################################################################
 
 import objc
+from math import tan, radians
 from GlyphsApp import *
 from GlyphsApp.plugins import *
 
@@ -34,10 +35,10 @@ class ShowExportStatus(ReporterPlugin):
 			try:
 				thisFont = Layer.parent.parent
 				thisMaster = thisFont.masters[Layer.associatedMasterId]
-				italicAngle = math.radians( thisMaster.italicAngle ) #% 90.0 )
+				italicAngle = radians( thisMaster.italicAngle ) #% 90.0 )
 			except:
 				italicAngle = 0.0
-			tangens = math.tan( italicAngle )
+			tangens = tan( italicAngle )
 			
 			# determine coordinates:
 			Master = Layer.associatedFontMaster()
