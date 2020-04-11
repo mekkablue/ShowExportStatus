@@ -81,7 +81,7 @@ class ShowExportStatus(ReporterPlugin):
 			self.logToConsole( "inactiveLayer: %s" % str(e) )
 
 	@objc.python_method
-	def preview(self, layer):
+	def preview(self, Layer):
 		try:
 			thisGlyph = Layer.glyph()
 			if thisGlyph and not thisGlyph.export:
