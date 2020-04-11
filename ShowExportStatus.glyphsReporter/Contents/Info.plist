@@ -3,9 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>English</string>
-	<key>CFBundleDisplayName</key>
-	<string>ShowExportStatus</string>
+	<string>en</string>
 	<key>CFBundleExecutable</key>
 	<string>plugin</string>
 	<key>CFBundleIdentifier</key>
@@ -13,26 +11,24 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>ShowExport</string>
-	<key>CFBundlePackageType</key>
-	<string>BNDL</string>
-	<key>CFBundleVersion</key>
-	<string>8</string>
+	<string>Show Export Status</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.7</string>
+	<string>2.0</string> <!-- 1.0 -->
+	<key>CFBundleVersion</key>
+	<string>9</string> <!-- 123 -->
 	<key>UpdateFeedURL</key>
 	<string>https://raw.githubusercontent.com/mekkablue/ShowExportStatus/master/ShowExportStatus.glyphsReporter/Contents/Info.plist</string>
 	<key>productPageURL</key>
 	<string>https://github.com/mekkablue/ShowExportStatus</string>
 	<key>productReleaseNotes</key>
-	<string>Updated to latest API</string>
+	<string>Updated for Glyphs 3</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>Copyright, Rainer Erich Scheichelbauer (mekkablue), 2015</string>
+	<string>Copyright, Rainer Erich Scheichelbauer, 2015–2020</string>
 	<key>NSPrincipalClass</key>
-	<string>ShowExport</string>
+	<string>ShowExportStatus</string>
 	<key>PyMainFileNames</key>
 	<array>
-		<string>../MacOS/main.py</string>
+		<string>plugin.py</string>
 	</array>
 </dict>
 </plist>

@@ -1,15 +1,33 @@
 # encoding: utf-8
+from __future__ import division, print_function, unicode_literals
+
+###########################################################################################################
+#
+#
+#	Reporter Plugin
+#
+#	Read the docs:
+#	https://github.com/schriftgestalt/GlyphsSDK/tree/master/Python%20Templates/Reporter
+#
+#
+###########################################################################################################
 
 import objc
 from GlyphsApp import *
 from GlyphsApp.plugins import *
-import sys, os, re, math, traceback
 
-class ShowExport(ReporterPlugin):
-	
+class ShowExportStatus(ReporterPlugin):
+
+	@objc.python_method
 	def settings(self):
-		self.menuName = "Export Status"
-
+		self.menuName = Glyphs.localize({
+			'en': 'Export Status',
+			'de': 'Export-Status',
+			'es': 'estado del exporto',
+			'fr': 'stade d’export',
+		})
+	
+	@objc.python_method
 	def drawCrossOverLayer( self, Layer, lineWidth ):
 		try:
 			# determine italic angle:
@@ -43,21 +61,37 @@ class ShowExport(ReporterPlugin):
 		except Exception as e:
 			self.logToConsole( "drawCrossOverLayer_: %s" % str(e) )
 
+	@objc.python_method
 	def background( self, Layer ):
 		try:
-			if not Layer.glyph().export:
-				self.drawCrossOverLayer( Layer, 1.0 / self.getScale() )
+			thisGlyph = Layer.glyph()
+			if thisGlyph and not thisGlyph.export:
+				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
 		except Exception as e:
-			self.logToConsole( "drawForegroundForLayer_: %s" % str(e) )
-		
+			self.logToConsole( "background: %s" % str(e) )
+
+	@objc.python_method	
 	def inactiveLayer(self, Layer):
 		try:
 			thisGlyph = Layer.glyph()
 			if thisGlyph and not thisGlyph.export:
 				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
 		except Exception as e:
-			print traceback.format_exc()
-	
+			self.logToConsole( "inactiveLayer: %s" % str(e) )
+
+	@objc.python_method
+	def preview(self, layer):
+		try:
+			thisGlyph = Layer.glyph()
+			if thisGlyph and not thisGlyph.export:
+				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
+		except Exception as e:
+			self.logToConsole( "preview: %s" % str(e) )
+
 	def needsExtraMainOutlineDrawingForInactiveLayer_( self, Layer ):
 		return True
 
+	@objc.python_method
+	def __file__(self):
+		"""Please leave this method unchanged"""
+		return __file__
