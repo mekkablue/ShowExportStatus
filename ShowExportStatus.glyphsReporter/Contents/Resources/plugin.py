@@ -72,13 +72,18 @@ class ShowExportStatus(ReporterPlugin):
 			self.logToConsole( "background: %s" % str(e) )
 
 	@objc.python_method	
-	def inactiveLayer(self, Layer):
+	def inactiveLayerBackground(self, Layer):
 		try:
 			thisGlyph = Layer.glyph()
 			if thisGlyph and not thisGlyph.export:
 				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
 		except Exception as e:
 			self.logToConsole( "inactiveLayer: %s" % str(e) )
+			
+	@objc.python_method	
+	def inactiveLayer(self, Layer):
+		self.inactiveLayerBackground(Layer)
+		# legacy method for backwards compatibility
 
 	@objc.python_method
 	def preview(self, Layer):
