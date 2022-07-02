@@ -24,8 +24,8 @@ class ShowExportStatus(ReporterPlugin):
 		self.menuName = Glyphs.localize({
 			'en': 'Export Status',
 			'de': 'Export-Status',
-			'es': 'estado del exporto',
-			'fr': 'stade d’export',
+			'es': 'estado de la exportación',
+			'fr': 'état de l’export',
 		})
 	
 	@objc.python_method
