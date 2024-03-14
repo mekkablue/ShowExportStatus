@@ -30,11 +30,14 @@ class ShowExportStatus(ReporterPlugin):
 		})
 
 	@objc.python_method
-	def drawCross(self, xMin, xMax, yMin, yMax, lineWidth=1, italicAngle=0, halfXHeight=0):
+	def drawCross(self, xMin, xMax, yMin, yMax, lineWidth=1, italicAngle=0, halfXHeight=0, isDarkMode=False):
 		tangens = tan(italicAngle)
 		italicBottomOffset = tangens * (yMin - halfXHeight)
 		italicTopOffset = tangens * (yMax - halfXHeight)
-		NSColor.redColor().set()
+		if isDarkMode:
+			NSColor.systemPinkColor().set() # visibility is a bit better
+		else:
+			NSColor.systemRedColor().set()
 		cross = NSBezierPath.bezierPath()
 		cross.moveToPoint_(NSPoint(xMin + italicBottomOffset, yMin))
 		cross.lineToPoint_(NSPoint(xMax + italicTopOffset,    yMax))
@@ -52,62 +55,64 @@ class ShowExportStatus(ReporterPlugin):
 		self.drawCross(xMin, xMax, yMin, yMax)
 	
 	@objc.python_method
-	def drawCrossOverLayer(self, Layer, lineWidth):
+	def drawCrossOverLayer(self, layer, lineWidth, isDarkMode=False):
 		try:
+			master = layer.associatedFontMaster()
+
 			# determine italic angle:
 			try:
-				thisFont = Layer.parent.parent
-				thisMaster = thisFont.masters[Layer.associatedMasterId]
-				italicAngle = radians(thisMaster.italicAngle) #% 90.0)
+				italicAngle = radians(master.italicAngle) #% 90.0)
 			except:
 				italicAngle = 0.0
 			
 			# determine coordinates:
-			Master = Layer.associatedFontMaster()
-			halfXHeight = Master.xHeight/2.0
-			yMax = Master.ascender
-			xMax = Layer.width
-			yMin = Master.descender
+			halfXHeight = master.xHeight / 2.0
+			yMax = master.ascender
+			xMax = layer.width
+			yMin = master.descender
 			xMin = 0
 			
 			# draw cross:
-			self.drawCross(xMin, xMax, yMin, yMax, lineWidth=lineWidth, italicAngle=italicAngle, halfXHeight=halfXHeight)
+			self.drawCross(xMin, xMax, yMin, yMax, lineWidth=lineWidth, italicAngle=italicAngle, halfXHeight=halfXHeight, isDarkMode=isDarkMode)
 		except Exception as e:
-			self.logToConsole("drawCrossOverLayer_: %s" % str(e))
+			self.logToConsole("drawCrossOverLayer: %s" % str(e))
 
 	@objc.python_method
-	def background(self, Layer):
-		try:
-			thisGlyph = Layer.glyph()
-			if thisGlyph and not thisGlyph.export:
-				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
-		except Exception as e:
-			self.logToConsole("background: %s" % str(e))
+	def drawCrossOverLayerInEditView(self, layer):
+		glyph = layer.glyph()
+		if glyph and not glyph.export:
+			self.drawCrossOverLayer(
+				layer,
+				1.0 / self.getScale(),
+				isDarkMode=self.controller.graphicView().drawDark(),
+				)
+	
+	@objc.python_method
+	def background(self, layer):
+		self.drawCrossOverLayerInEditView(layer)
 
 	@objc.python_method	
-	def inactiveLayerBackground(self, Layer):
-		try:
-			thisGlyph = Layer.glyph()
-			if thisGlyph and not thisGlyph.export:
-				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
-		except Exception as e:
-			self.logToConsole("inactiveLayer: %s" % str(e))
+	def inactiveLayerBackground(self, layer):
+		self.drawCrossOverLayerInEditView(layer)
 			
 	@objc.python_method	
-	def inactiveLayer(self, Layer):
+	def inactiveLayer(self, layer):
 		self.inactiveLayerBackground(Layer)
 		# legacy method for backwards compatibility
 
-	@objc.python_method
-	def preview(self, Layer):
+	def drawBackgroundInPreviewLayer_options_(self, layer, options):
 		try:
-			thisGlyph = Layer.glyph()
-			if thisGlyph and not thisGlyph.export:
-				self.drawCrossOverLayer(Layer, 1.0 / self.getScale())
+			glyph = layer.glyph()
+			if glyph and not glyph.export:
+				self.drawCrossOverLayer(
+					layer,
+					1.0 / options["Scale"],
+					isDarkMode=options["Black"],
+					)
 		except Exception as e:
 			self.logToConsole("preview: %s" % str(e))
 
-	def needsExtraMainOutlineDrawingForInactiveLayer_(self, Layer):
+	def needsExtraMainOutlineDrawingForInactiveLayer_(self, layer):
 		return True
 
 	@objc.python_method
